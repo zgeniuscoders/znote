@@ -76,5 +76,7 @@ dependencies {
     annotationProcessor (libs.androidx.room.compiler)
     kapt (libs.androidx.room.room.compiler)
 
+    implementation(libs.compose.markdown)
+
 
 }
