@@ -5,12 +5,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import cd.zgeniuscoders.znote.note.presenation.add_note.AddNotePage
+import cd.zgeniuscoders.znote.note.presenation.edit_note.EditNotePage
+import cd.zgeniuscoders.znote.note.presenation.home.HomePage
+import cd.zgeniuscoders.znote.note.presenation.show_note.ShowNotePage
 import cd.zgeniuscoders.znote.ui.theme.ZnoteTheme
 
 class MainActivity : ComponentActivity() {
@@ -20,28 +23,32 @@ class MainActivity : ComponentActivity() {
         setContent {
             ZnoteTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+
+                    val navController = rememberNavController()
+
+                    NavHost(navController = navController, startDestination = Routes.Home) {
+
+                        composable<Routes.Home> {
+                            HomePage(navController)
+                        }
+
+                        composable<Routes.ShowNote> {
+                            ShowNotePage(navController) { }
+                        }
+
+                        composable<Routes.EditNote> {
+                            EditNotePage(navController)
+                        }
+
+                        composable<Routes.AddNote> {
+                            AddNotePage(navController)
+                        }
+
+                    }
+
                 }
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    ZnoteTheme {
-        Greeting("Android")
-    }
-}

@@ -16,7 +16,7 @@ data class NotesDto(
 @Serializable
 data class NoteDtoData(
     @SerialName("id")
-    val id: String,
+    val id: Int,
     @SerialName("title")
     val title: String,
     @SerialName("content")

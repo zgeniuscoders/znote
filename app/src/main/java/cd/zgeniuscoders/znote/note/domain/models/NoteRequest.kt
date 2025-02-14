@@ -5,8 +5,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class NoteRequest(
-    @SerialName("id")
-    val id: String,
     @SerialName("title")
     val title: String,
     @SerialName("content")

@@ -3,6 +3,7 @@ package cd.zgeniuscoders.znote.note.data.repository
 import cd.zgeniuscoders.znote.note.data.local.NoteDaoService
 import cd.zgeniuscoders.znote.note.data.local.NoteEntity
 import cd.zgeniuscoders.znote.note.domain.models.Note
+import cd.zgeniuscoders.znote.note.domain.models.NoteRequest
 import cd.zgeniuscoders.znote.note.domain.repository.NoteRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -31,9 +32,9 @@ class RoomNoteRepository(
 
     }
 
-    override suspend fun addNote(note: Note) {
+    override suspend fun addNote(note: NoteRequest) {
         noteDaoService
-            .add(NoteEntity.fromModel(note))
+            .add(NoteEntity.fromModelRequest(note))
     }
 
     override suspend fun deleteNote(note: Note) {

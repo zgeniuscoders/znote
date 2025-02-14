@@ -4,12 +4,13 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import cd.zgeniuscoders.znote.note.domain.models.Note
+import cd.zgeniuscoders.znote.note.domain.models.NoteRequest
 
 @Entity(tableName = "notes")
 data class NoteEntity(
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
-    val id: Int,
+    val id: Int = 0,
 
     @ColumnInfo("title")
     val title: String,
@@ -25,7 +26,14 @@ data class NoteEntity(
     companion object {
         fun fromModel(data: Note): NoteEntity {
             return NoteEntity(
-                id = data.id,
+                title = data.title,
+                content = data.content,
+                createdAt = data.createdAt,
+            )
+        }
+
+        fun fromModelRequest(data: NoteRequest): NoteEntity {
+            return NoteEntity(
                 title = data.title,
                 content = data.content,
                 createdAt = data.createdAt,
