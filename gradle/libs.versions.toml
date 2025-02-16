@@ -16,8 +16,10 @@ navigationCompose = "2.8.7"
 kotlinxCoroutinesAndroid = "1.9.0"
 coreSplashscreen = "1.0.1"
 roomRuntime = "2.6.1"
+constraintlayoutCompose = "1.1.0"
 
 [libraries]
+androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 compose-markdown = { module = "com.github.jeziellago:compose-markdown", version.ref = "composeMarkdown" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

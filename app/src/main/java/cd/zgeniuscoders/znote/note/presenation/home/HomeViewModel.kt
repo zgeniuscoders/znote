@@ -2,6 +2,8 @@ package cd.zgeniuscoders.znote.note.presenation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cd.zgeniuscoders.znote.Resource
+import cd.zgeniuscoders.znote.note.data.mappers.toNoteListModel
 import cd.zgeniuscoders.znote.note.domain.repository.NoteRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -23,9 +25,10 @@ class HomeViewModel(
         }
         .stateIn(
             viewModelScope,
-            SharingStarted.WhileSubscribed(5000L),
+            SharingStarted.Eagerly,
             _state.value
         )
+
 
     fun onTriggerEvent(event: HomeEvent){
 
@@ -33,13 +36,34 @@ class HomeViewModel(
 
     private fun getNotes() {
         viewModelScope.launch {
+
+            _state.update {
+                it.copy(flashMessage = "")
+            }
+
             noteRepository
                 .getNotes()
-                .onEach { notes ->
+                .onEach { res ->
 
-                    _state.update {
-                        it.copy(notes = notes)
+                    when (res) {
+
+                        is Resource.Error -> {
+
+                            _state.update {
+                                it.copy(flashMessage = res.message.toString())
+                            }
+
+                        }
+
+                        is Resource.Success -> {
+                            val notes = res.data!!.toNoteListModel()
+                            _state.update {
+                                it.copy(notes = notes)
+                            }
+
+                        }
                     }
+
 
                 }.launchIn(viewModelScope)
         }

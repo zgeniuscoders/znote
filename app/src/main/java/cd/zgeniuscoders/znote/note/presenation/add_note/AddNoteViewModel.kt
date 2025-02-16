@@ -2,14 +2,18 @@ package cd.zgeniuscoders.znote.note.presenation.add_note
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import cd.zgeniuscoders.znote.Resource
 import cd.zgeniuscoders.znote.note.domain.models.NoteRequest
 import cd.zgeniuscoders.znote.note.domain.repository.NoteRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Date
 
 class AddNoteViewModel(
     private val noteRepository: NoteRepository
@@ -28,7 +32,7 @@ class AddNoteViewModel(
         when (event) {
             is AddNoteEvent.OnContentChange -> _state.update { it.copy(content = event.content) }
             AddNoteEvent.OnSaveNote -> addNote()
-            is AddNoteEvent.OnTitleChange -> _state.update { it.copy(content = event.title) }
+            is AddNoteEvent.OnTitleChange -> _state.update { it.copy(title = event.title) }
         }
     }
 
@@ -51,13 +55,22 @@ class AddNoteViewModel(
                         NoteRequest(
                             title = state.value.title,
                             content = state.value.content,
-                            createdAt = 12
+                            createdAt = Date().time
                         )
-                    )
-
-                _state.update {
-                    it.copy(isAdded = true)
-                }
+                    ).onEach { res->
+                        when(res){
+                            is Resource.Error -> {
+                                _state.update {
+                                    it.copy(flashMessage = res.message.toString(), isAdded = false)
+                                }
+                            }
+                            is Resource.Success -> {
+                                _state.update {
+                                    it.copy(isAdded = true)
+                                }
+                            }
+                        }
+                    }.launchIn(viewModelScope)
 
             } else {
                 _state.update {

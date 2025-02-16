@@ -4,7 +4,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
+import cd.zgeniuscoders.znote.Resource
 import cd.zgeniuscoders.znote.Routes
+import cd.zgeniuscoders.znote.note.data.mappers.toNoteModel
 import cd.zgeniuscoders.znote.note.domain.models.Note
 import cd.zgeniuscoders.znote.note.domain.repository.NoteRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,6 +17,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Date
 
 class EditNoteViewModel(
     private val noteRepository: NoteRepository,
@@ -36,7 +39,7 @@ class EditNoteViewModel(
         when (event) {
             is EditNoteEvent.OnContentChange -> _state.update { it.copy(content = event.content) }
             EditNoteEvent.OnSaveNote -> updateNote()
-            is EditNoteEvent.OnTitleChange -> _state.update { it.copy(content = event.title) }
+            is EditNoteEvent.OnTitleChange -> _state.update { it.copy(title = event.title) }
         }
     }
 
@@ -52,12 +55,38 @@ class EditNoteViewModel(
 
     private fun getNote() {
         viewModelScope.launch {
+
+            _state.update {
+                it.copy(flashMessage = "")
+            }
+
             noteRepository
                 .getNote(noteId)
-                .onEach { note ->
+                .onEach { res ->
 
-                    _state.update {
-                        it.copy(content = note.content, title = note.title, noteId = note.id)
+                    when (res) {
+                        is Resource.Error -> {
+                            _state.update {
+                                it.copy(flashMessage = res.message.toString())
+                            }
+                        }
+
+                        is Resource.Success -> {
+                            if (res.data != null) {
+                                val note = res.data.toNoteModel()
+                                _state.update {
+                                    it.copy(
+                                        content = note.content,
+                                        title = note.title,
+                                        noteId = note.id
+                                    )
+                                }
+                            } else {
+                                _state.update {
+                                    it.copy(flashMessage = "An excepted error occurred")
+                                }
+                            }
+                        }
                     }
 
                 }.launchIn(viewModelScope)
@@ -66,6 +95,11 @@ class EditNoteViewModel(
 
     private fun updateNote() {
         viewModelScope.launch {
+
+            _state.update {
+                it.copy(flashMessage = "")
+            }
+
             if (validate()) {
 
                 noteRepository
@@ -75,13 +109,25 @@ class EditNoteViewModel(
                             id = state.value.noteId,
                             title = state.value.title,
                             content = state.value.content,
-                            createdAt = state.value.createdAt
+                            createdAt = Date().time
                         )
-                    )
+                    ).onEach { res ->
 
-                _state.update {
-                    it.copy(isUpdated = true)
-                }
+                        when (res) {
+                            is Resource.Error -> {
+                                _state.update {
+                                    it.copy(flashMessage = res.message.toString())
+                                }
+                            }
+
+                            is Resource.Success -> {
+                                _state.update {
+                                    it.copy(isUpdated = true)
+                                }
+                            }
+                        }
+
+                    }.launchIn(viewModelScope)
 
             } else {
                 _state.update {

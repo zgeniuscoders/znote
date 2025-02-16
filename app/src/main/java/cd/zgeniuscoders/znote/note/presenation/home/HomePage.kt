@@ -25,9 +25,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import cd.zgeniuscoders.znote.Routes
 import cd.zgeniuscoders.znote.note.domain.models.Note
 import cd.zgeniuscoders.znote.ui.theme.ZnoteTheme
-import dev.jeziellago.compose.markdowntext.MarkdownText
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -54,51 +54,63 @@ fun HomeBody(
     onEvent: (event: HomeEvent) -> Unit
 ) {
 
-
-    Column {
-
-        Column { 
-            Text("Toutes les notes")
-            Text("8 notes")
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                navHostController.navigate(Routes.AddNote)
+            }) {
+                Icon(Icons.Rounded.EditNote, contentDescription = "add note button")
+            }
         }
-
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
+    ) { innerP ->
+        Column(
+            modifier = Modifier.padding(innerP)
         ) {
-            items(state.notes) { note ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.spacedBy(10.dp)
-                ) {
-                    Card(
+
+            Column {
+                Text("Toutes les notes")
+                Text("8 notes")
+            }
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+            ) {
+                items(state.notes) { note ->
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(200.dp)
+                            .padding(10.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
-                        Text(note.content, modifier = Modifier.padding(10.dp))
-                    }
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            note.title,
-                            style = MaterialTheme.typography.titleMedium
-                        )
-                        Text(
-                            "13 Jan",
-                            color = MaterialTheme.colorScheme.secondary,
-                        )
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
+                            onClick = {
+                                navHostController.navigate(Routes.ShowNote(note.id))
+                            }
+                        ) {
+                            Text(note.content, modifier = Modifier.padding(10.dp))
+                        }
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                note.title,
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(
+                                "13 Jan",
+                                color = MaterialTheme.colorScheme.secondary,
+                            )
+                        }
                     }
                 }
             }
+
         }
-
     }
-
-
 
 }
 
@@ -106,20 +118,14 @@ fun HomeBody(
 @Composable
 fun HomePreview(modifier: Modifier = Modifier) {
     ZnoteTheme {
-        Scaffold(
-            floatingActionButton = {
-                FloatingActionButton(onClick = {}) {
-                    Icon(Icons.Rounded.EditNote, contentDescription = "")
-                }
-            }
-        ) { innerP ->
-            HomeBody(
-                rememberNavController(),
-                HomeState(
-                    notes = (1..20).map { note }
-                )
-            ) { }
-        }
+
+        HomeBody(
+            rememberNavController(),
+            HomeState(
+                notes = (1..20).map { note }
+            )
+        ) { }
+
     }
 }
 

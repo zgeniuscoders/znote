@@ -3,6 +3,7 @@ package cd.zgeniuscoders.znote.note.data.local
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import cd.zgeniuscoders.znote.note.data.dto.NoteDtoData
 import cd.zgeniuscoders.znote.note.domain.models.Note
 import cd.zgeniuscoders.znote.note.domain.models.NoteRequest
 
@@ -26,6 +27,7 @@ data class NoteEntity(
     companion object {
         fun fromModel(data: Note): NoteEntity {
             return NoteEntity(
+                id = data.id,
                 title = data.title,
                 content = data.content,
                 createdAt = data.createdAt,
@@ -41,12 +43,12 @@ data class NoteEntity(
         }
     }
 
-    fun toModel(): Note {
-        return Note(
+    fun toNoteDtoData(): NoteDtoData {
+        return NoteDtoData(
             id,
             title,
             content,
-            createdAt,
+            createdAt
         )
     }
 

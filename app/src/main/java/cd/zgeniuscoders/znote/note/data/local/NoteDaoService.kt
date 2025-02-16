@@ -19,9 +19,9 @@ interface NoteDaoService {
     fun totalItemCount(): Flow<Int>
 
     @Query("SELECT * FROM notes where id = :id")
-    fun show(id: Int): Flow<NoteEntity>
+    fun show(id: Int): NoteEntity
 
     @Query("SELECT * FROM notes")
-    fun all(): Flow<List<NoteEntity>>
+    fun all(): List<NoteEntity>
 
 }
