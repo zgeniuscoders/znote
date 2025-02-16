@@ -1,5 +1,6 @@
 [versions]
 agp = "8.8.1"
+composeMarkdown = "0.5.6"
 kotlin = "2.0.20"
 coreKtx = "1.15.0"
 junit = "4.13.2"
@@ -15,9 +16,12 @@ navigationCompose = "2.8.7"
 kotlinxCoroutinesAndroid = "1.9.0"
 coreSplashscreen = "1.0.1"
 roomRuntime = "2.6.1"
+constraintlayoutCompose = "1.1.0"
 
 [libraries]
+androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+compose-markdown = { module = "com.github.jeziellago:compose-markdown", version.ref = "composeMarkdown" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

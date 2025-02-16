@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">znote</string>
+    <string name="content_lbl">Contenu</string>
+    <string name="title_lbl">Titre</string>
 </resources>

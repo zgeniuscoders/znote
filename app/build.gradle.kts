@@ -60,6 +60,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
 
+    implementation(libs.androidx.constraintlayout.compose)
 
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.koin.core)
@@ -75,6 +76,8 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     annotationProcessor (libs.androidx.room.compiler)
     kapt (libs.androidx.room.room.compiler)
+
+    implementation(libs.compose.markdown)
 
 
 }
