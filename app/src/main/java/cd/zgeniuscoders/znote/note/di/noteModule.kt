@@ -4,6 +4,7 @@ import androidx.room.Room
 import cd.zgeniuscoders.znote.note.data.local.NoteDaoService
 import cd.zgeniuscoders.znote.note.data.local.NoteDatabase
 import cd.zgeniuscoders.znote.note.data.repository.RoomNoteRepository
+import cd.zgeniuscoders.znote.note.data.services.SpeechRecognitionService
 import cd.zgeniuscoders.znote.note.domain.repository.NoteRepository
 import cd.zgeniuscoders.znote.note.presenation.add_note.AddNoteViewModel
 import cd.zgeniuscoders.znote.note.presenation.edit_note.EditNoteViewModel
@@ -29,6 +30,12 @@ val noteModule = module {
     single<NoteDaoService> {
         val noteDb = get<NoteDatabase>()
         noteDb.noteDao()
+    }
+
+
+    single<SpeechRecognitionService> {
+        val appContext = androidContext()
+        SpeechRecognitionService(appContext)
     }
 
     single<NoteRepository> {

@@ -1,5 +1,7 @@
 package cd.zgeniuscoders.znote
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -8,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -18,8 +22,12 @@ import cd.zgeniuscoders.znote.note.presenation.show_note.ShowNotePage
 import cd.zgeniuscoders.znote.ui.theme.ZnoteTheme
 
 class MainActivity : ComponentActivity() {
+
+    private val REQUEST_CODE_PERMISSION: Int = 8000
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        requestAudioRecordPermission()
         enableEdgeToEdge()
         setContent {
             ZnoteTheme {
@@ -50,6 +58,20 @@ class MainActivity : ComponentActivity() {
 
                 }
             }
+        }
+    }
+
+
+    private fun requestAudioRecordPermission(){
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.RECORD_AUDIO
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            ActivityCompat.requestPermissions(
+                this, arrayOf(Manifest.permission.RECORD_AUDIO),
+                REQUEST_CODE_PERMISSION
+            )
         }
     }
 }

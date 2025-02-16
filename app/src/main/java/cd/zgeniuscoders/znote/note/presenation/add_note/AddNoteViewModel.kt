@@ -3,6 +3,8 @@ package cd.zgeniuscoders.znote.note.presenation.add_note
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cd.zgeniuscoders.znote.Resource
+import cd.zgeniuscoders.znote.note.data.mappers.toSpeechModel
+import cd.zgeniuscoders.znote.note.data.services.SpeechRecognitionService
 import cd.zgeniuscoders.znote.note.domain.models.NoteRequest
 import cd.zgeniuscoders.znote.note.domain.repository.NoteRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +18,8 @@ import kotlinx.coroutines.launch
 import java.util.Date
 
 class AddNoteViewModel(
-    private val noteRepository: NoteRepository
+    private val noteRepository: NoteRepository,
+    private val speechRecognitionService: SpeechRecognitionService
 ) : ViewModel() {
 
     private var _state = MutableStateFlow(AddNoteState())
@@ -33,6 +36,7 @@ class AddNoteViewModel(
             is AddNoteEvent.OnContentChange -> _state.update { it.copy(content = event.content) }
             AddNoteEvent.OnSaveNote -> addNote()
             is AddNoteEvent.OnTitleChange -> _state.update { it.copy(title = event.title) }
+            AddNoteEvent.OnLaunchSpeechNote -> startRecognition()
         }
     }
 
@@ -79,5 +83,32 @@ class AddNoteViewModel(
             }
         }
     }
+
+    private fun startRecognition() {
+        viewModelScope.launch {
+            speechRecognitionService
+                .startSpeechRecognition()
+                .onEach { res ->
+
+                    when (res) {
+                        is Resource.Error -> {
+                            _state.update {
+                                it.copy(flashMessage = res.message.toString())
+                            }
+                        }
+
+                        is Resource.Success -> {
+                            val message = res.data!!.toSpeechModel().message
+                            val content = "${state.value.content}\n${message}"
+                            _state.update {
+                                it.copy(content = content)
+                            }
+                        }
+                    }
+
+                }.launchIn(viewModelScope)
+        }
+    }
+
 
 }

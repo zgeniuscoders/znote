@@ -7,7 +7,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBackIosNew
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Mic
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
@@ -137,6 +139,15 @@ fun AddNoteBody(
                         Icon(Icons.Rounded.Check, contentDescription = "save note button")
                     }
                 })
+        },
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    onEvent(AddNoteEvent.OnLaunchSpeechNote)
+                }
+            ) {
+                Icon(Icons.Rounded.Mic, contentDescription = "record note voice")
+            }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { innerP ->
