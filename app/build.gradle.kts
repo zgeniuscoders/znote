@@ -79,5 +79,7 @@ dependencies {
 
     implementation(libs.compose.markdown)
 
+    implementation("com.github.donald-okara:TextieMDLibrary:1.0.4")
+
 
 }
