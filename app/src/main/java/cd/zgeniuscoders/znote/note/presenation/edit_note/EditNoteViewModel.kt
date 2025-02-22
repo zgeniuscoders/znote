@@ -109,7 +109,8 @@ class EditNoteViewModel(
                             id = state.value.noteId,
                             title = state.value.title,
                             content = state.value.content,
-                            createdAt = Date().time
+                            createdAt = Date().time,
+                            isDelete = false
                         )
                     ).onEach { res ->
 

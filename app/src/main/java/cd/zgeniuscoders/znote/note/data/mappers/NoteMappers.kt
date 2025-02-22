@@ -9,7 +9,8 @@ fun NoteDto.toNoteModel(): Note {
         id = data.id,
         title = data.title,
         content = data.content,
-        createdAt = data.createdAt
+        createdAt = data.createdAt,
+        isDelete = data.isDelete
     )
 }
 
@@ -19,7 +20,8 @@ fun NotesDto.toNoteListModel(): List<Note> {
             id = it.id,
             title = it.title,
             content = it.content,
-            createdAt = it.createdAt
+            createdAt = it.createdAt,
+            isDelete = it.isDelete
         )
     }
 }

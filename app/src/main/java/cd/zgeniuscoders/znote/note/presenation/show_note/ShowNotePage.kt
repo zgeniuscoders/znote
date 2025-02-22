@@ -29,7 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import cd.zgeniuscoders.znote.Routes
-import cd.zgeniuscoders.znote.note.presenation.home.note
+import cd.zgeniuscoders.znote.note.presenation.delete_notes.note
 import cd.zgeniuscoders.znote.ui.theme.ZnoteTheme
 import dev.jeziellago.compose.markdowntext.MarkdownText
 import org.koin.androidx.compose.koinViewModel

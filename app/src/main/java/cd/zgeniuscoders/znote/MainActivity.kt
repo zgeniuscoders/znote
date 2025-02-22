@@ -16,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import cd.zgeniuscoders.znote.note.presenation.add_note.AddNotePage
+import cd.zgeniuscoders.znote.note.presenation.delete_notes.DeleteNotePage
 import cd.zgeniuscoders.znote.note.presenation.edit_note.EditNotePage
 import cd.zgeniuscoders.znote.note.presenation.home.HomePage
 import cd.zgeniuscoders.znote.note.presenation.show_note.ShowNotePage
@@ -39,7 +40,11 @@ class MainActivity : ComponentActivity() {
                     NavHost(navController = navController, startDestination = Routes.Home) {
 
                         composable<Routes.Home> {
-                            HomePage(navController)
+                            HomePage(navController,snackbarHostState)
+                        }
+
+                        composable<Routes.DeleteNotes> {
+                            DeleteNotePage(navController,snackbarHostState)
                         }
 
                         composable<Routes.ShowNote> {

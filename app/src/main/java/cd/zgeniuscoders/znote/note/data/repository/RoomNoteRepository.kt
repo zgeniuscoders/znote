@@ -8,9 +8,13 @@ import cd.zgeniuscoders.znote.note.data.local.NoteEntity
 import cd.zgeniuscoders.znote.note.domain.models.Note
 import cd.zgeniuscoders.znote.note.domain.models.NoteRequest
 import cd.zgeniuscoders.znote.note.domain.repository.NoteRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 class RoomNoteRepository(
     private val noteDaoService: NoteDaoService
@@ -54,6 +58,66 @@ class RoomNoteRepository(
 
         awaitClose()
 
+    }
+
+    override suspend fun getDeleteNotes(): Flow<Resource<NotesDto>> = callbackFlow{
+        try {
+            val notes = noteDaoService
+                .allDelete()
+                .map { noteEntities ->
+
+                    noteEntities.toNoteDtoData()
+                }
+
+
+            trySend(
+                Resource.Success(
+                    NotesDto(
+                        notes
+                    )
+                )
+            )
+
+
+        } catch (e: NullPointerException) {
+            e.printStackTrace()
+            trySend(
+                Resource.Error(
+                    e.message.toString()
+                )
+            )
+        } catch (e: Exception) {
+            e.printStackTrace()
+            trySend(
+                Resource.Error(
+                    e.message.toString()
+                )
+            )
+        }
+
+        awaitClose()
+    }
+
+    override suspend fun getNoteCount(): Flow<Resource<Int>> = callbackFlow {
+        try {
+            noteDaoService
+                .totalItemCount()
+                .onEach {
+                    trySend(
+                        Resource.Success(
+                            it
+                        )
+                    )
+                }.launchIn(CoroutineScope(Dispatchers.IO))
+        } catch (e: Exception) {
+            trySend(
+                Resource.Error(
+                    e.message.toString()
+                )
+            )
+        }
+
+        awaitClose()
     }
 
     override suspend fun getNote(noteId: Int): Flow<Resource<NoteDto>> = callbackFlow {

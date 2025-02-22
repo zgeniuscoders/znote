@@ -8,6 +8,7 @@ import cd.zgeniuscoders.znote.note.data.services.SpeechRecognitionService
 import cd.zgeniuscoders.znote.note.domain.repository.NoteRepository
 import cd.zgeniuscoders.znote.note.presenation.add_note.AddNoteViewModel
 import cd.zgeniuscoders.znote.note.presenation.edit_note.EditNoteViewModel
+import cd.zgeniuscoders.znote.note.presenation.delete_notes.DeleteNoteViewModel
 import cd.zgeniuscoders.znote.note.presenation.home.HomeViewModel
 import cd.zgeniuscoders.znote.note.presenation.show_note.ShowNoteViewModel
 import org.koin.android.ext.koin.androidContext
@@ -45,6 +46,7 @@ val noteModule = module {
     viewModelOf(::AddNoteViewModel)
     viewModelOf(::EditNoteViewModel)
     viewModelOf(::ShowNoteViewModel)
+    viewModelOf(::DeleteNoteViewModel)
     viewModelOf(::HomeViewModel)
 
 }

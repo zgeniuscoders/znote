@@ -19,6 +19,9 @@ data class NoteEntity(
     @ColumnInfo("content")
     val content: String,
 
+    @ColumnInfo("is_delete")
+    val isDelete: Boolean,
+
     @ColumnInfo("created_at")
     val createdAt: Long,
 
@@ -31,6 +34,7 @@ data class NoteEntity(
                 title = data.title,
                 content = data.content,
                 createdAt = data.createdAt,
+                isDelete = data.isDelete
             )
         }
 
@@ -39,6 +43,7 @@ data class NoteEntity(
                 title = data.title,
                 content = data.content,
                 createdAt = data.createdAt,
+                isDelete = data.isDelete
             )
         }
     }
@@ -48,7 +53,8 @@ data class NoteEntity(
             id,
             title,
             content,
-            createdAt
+            createdAt,
+            isDelete
         )
     }
 

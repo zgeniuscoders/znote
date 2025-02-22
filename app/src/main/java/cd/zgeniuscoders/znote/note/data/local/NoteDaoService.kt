@@ -15,13 +15,17 @@ interface NoteDaoService {
     @Delete
     suspend fun delete(data: NoteEntity)
 
-    @Query("SELECT COUNT(id) FROM notes")
+    @Query("SELECT COUNT(id) FROM notes WHERE is_delete = 0")
     fun totalItemCount(): Flow<Int>
 
     @Query("SELECT * FROM notes where id = :id")
     fun show(id: Int): NoteEntity
 
-    @Query("SELECT * FROM notes")
+    @Query("SELECT * FROM notes WHERE is_delete = 0 ORDER BY  created_at DESC")
     fun all(): List<NoteEntity>
+
+
+    @Query("SELECT * FROM notes WHERE is_delete = 1 ORDER BY  created_at DESC")
+    fun allDelete(): List<NoteEntity>
 
 }

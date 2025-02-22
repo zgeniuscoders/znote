@@ -1,6 +1,5 @@
 package cd.zgeniuscoders.znote.note.presenation.home
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,18 +15,25 @@ import androidx.compose.material.icons.rounded.EditNote
 import androidx.compose.material.icons.rounded.Menu
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Card
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -46,12 +52,17 @@ import androidx.navigation.compose.rememberNavController
 import cd.zgeniuscoders.znote.R
 import cd.zgeniuscoders.znote.Routes
 import cd.zgeniuscoders.znote.note.domain.models.Note
+import cd.zgeniuscoders.znote.note.presenation.delete_notes.DeleteNoteEvent
+import cd.zgeniuscoders.znote.note.presenation.home.components.DrawerBody
+import cd.zgeniuscoders.znote.note.presenation.home.components.DrawerHeader
 import cd.zgeniuscoders.znote.ui.theme.ZnoteTheme
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun HomePage(
-    navHostController: NavHostController
+    navHostController: NavHostController,
+    snackbarHostState: SnackbarHostState
 ) {
 
     val vm = koinViewModel<HomeViewModel>()
@@ -59,6 +70,7 @@ fun HomePage(
     val onEvent = vm::onTriggerEvent
 
     HomeBody(
+        snackbarHostState,
         navHostController,
         state,
         onEvent
@@ -69,12 +81,16 @@ fun HomePage(
 @OptIn(ExperimentalMotionApi::class)
 @Composable
 fun HomeBody(
+    snackbarHostState: SnackbarHostState,
     navHostController: NavHostController,
     state: HomeState,
     onEvent: (event: HomeEvent) -> Unit
 ) {
 
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val scope = rememberCoroutineScope()
     val lazyGridState = rememberLazyGridState()
+
     val context = LocalContext.current
     val motionScene = remember {
         context.resources.openRawResource(R.raw.motion_scene)
@@ -103,7 +119,14 @@ fun HomeBody(
     }
 
 
-
+    ModalNavigationDrawer(drawerState = drawerState,
+        gesturesEnabled = drawerState.isOpen,
+        drawerContent = {
+            ModalDrawerSheet {
+                DrawerHeader()
+                DrawerBody(navHostController, drawerState)
+            }
+        }) {
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(onClick = {
@@ -111,6 +134,9 @@ fun HomeBody(
             }) {
                 Icon(Icons.Rounded.EditNote, contentDescription = "add note button")
             }
+        },
+        snackbarHost = {
+            SnackbarHost(snackbarHostState)
         }
     ) { innerP ->
         Column(
@@ -138,24 +164,34 @@ fun HomeBody(
                         .fillMaxWidth()
                 )
                 Text(
-                    "${state.noteCount} notes",
+                    "${state.noteCount} note(s)",
                     color = MaterialTheme.colorScheme.secondary,
                     modifier = Modifier.layoutId("note_count")
                 )
 
                 IconButton(
-                    onClick = {},
+                    onClick = {
+                        scope.launch {
+                            drawerState.apply {
+                                if (isClosed) open() else close()
+                            }
+                        }
+                    },
+                    modifier = Modifier.layoutId("menu_button")
+                ) {
+                    Icon(Icons.Rounded.Menu, contentDescription = "menu button")
+                }
+
+                IconButton(
+                    onClick = {
+
+                    },
                     modifier = Modifier.layoutId("search_button")
                 ) {
                     Icon(Icons.Rounded.Search, contentDescription = "search note button")
                 }
 
-                IconButton(
-                    onClick = {},
-                    modifier = Modifier.layoutId("menu_button")
-                ) {
-                    Icon(Icons.Rounded.Menu, contentDescription = "menu button")
-                }
+
 
             }
 
@@ -199,7 +235,7 @@ fun HomeBody(
 
         }
     }
-
+    }
 }
 
 @PreviewLightDark
@@ -208,9 +244,10 @@ fun HomePreview(modifier: Modifier = Modifier) {
     ZnoteTheme {
 
         HomeBody(
+            snackbarHostState = SnackbarHostState(),
             rememberNavController(),
             HomeState(
-                notes = (1..20).map { note }
+                notes = (1..20).map { cd.zgeniuscoders.znote.note.presenation.delete_notes.note }
             )
         ) { }
 
@@ -221,5 +258,6 @@ internal val note = Note(
     1,
     "Myself bank",
     "# lorem ipsum \nhello world commen allez vous monsiier l'agent",
-    1
+    1,
+    false
 )

@@ -93,11 +93,14 @@ class ShowNoteViewModel(
                 it.copy(flashMessage = "")
             }
 
-            Log.i("VN_SCOPE", "on delete called")
-
+            var note = state.value.note!!
+            note = note.copy(isDelete = true)
 
             noteRepository
-                .deleteNote(state.value.note!!)
+                .updateNote(
+                    noteId = note.id,
+                    note = note
+                )
                 .onEach { res ->
 
                     when (res) {

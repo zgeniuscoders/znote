@@ -1,12 +1,11 @@
-package cd.zgeniuscoders.znote.note.presenation.home
+package cd.zgeniuscoders.znote.note.presenation.delete_notes
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cd.zgeniuscoders.znote.Resource
 import cd.zgeniuscoders.znote.note.data.mappers.toNoteListModel
+import cd.zgeniuscoders.znote.note.domain.models.Note
 import cd.zgeniuscoders.znote.note.domain.repository.NoteRepository
-import cd.zgeniuscoders.znote.note.presenation.delete_notes.DeleteNoteEvent
-import cd.zgeniuscoders.znote.note.presenation.delete_notes.DeleteNoteState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.launchIn
@@ -16,15 +15,14 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class HomeViewModel(
+class DeleteNoteViewModel(
     private val noteRepository: NoteRepository
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(HomeState())
+    private val _state = MutableStateFlow(DeleteNoteState())
     var state = _state
         .onStart {
             getNotes()
-            getNoteCount()
         }
         .stateIn(
             viewModelScope,
@@ -33,8 +31,10 @@ class HomeViewModel(
         )
 
 
-    fun onTriggerEvent(event: HomeEvent){
-
+    fun onTriggerEvent(event: DeleteNoteEvent) {
+        when (event) {
+            is DeleteNoteEvent.OnDeleteNote -> deleteNote(event.note)
+        }
     }
 
     private fun getNotes() {
@@ -45,7 +45,7 @@ class HomeViewModel(
             }
 
             noteRepository
-                .getNotes()
+                .getDeleteNotes()
                 .onEach { res ->
 
                     when (res) {
@@ -72,24 +72,38 @@ class HomeViewModel(
         }
     }
 
-
-    private fun  getNoteCount(){
+    private fun deleteNote(note: Note) {
         viewModelScope.launch {
+
+            _state.update {
+                it.copy(flashMessage = "",isLoading=true)
+            }
+
             noteRepository
-                .getNoteCount()
+                .deleteNote(
+                    note = note
+                )
                 .onEach { res ->
 
-                    when(res){
+                    when (res) {
                         is Resource.Error -> {
-                            _state.update { it.copy(flashMessage = res.message.toString()) }
+                            _state.update {
+                                it.copy(flashMessage = res.message.toString(), isLoading = false)
+                            }
                         }
+
                         is Resource.Success -> {
-                            _state.update { it.copy(noteCount = res.data!!) }
+                            _state.update {
+                                it.copy(isLoading = false)
+                            }
+                            getNotes()
                         }
                     }
 
                 }.launchIn(viewModelScope)
+
         }
     }
+
 
 }
