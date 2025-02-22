@@ -1,6 +1,8 @@
 package cd.zgeniuscoders.znote.note.presenation.home
 
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -8,23 +10,40 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.EditNote
+import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ExperimentalMotionApi
+import androidx.constraintlayout.compose.MotionLayout
+import androidx.constraintlayout.compose.MotionScene
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import cd.zgeniuscoders.znote.R
 import cd.zgeniuscoders.znote.Routes
 import cd.zgeniuscoders.znote.note.domain.models.Note
 import cd.zgeniuscoders.znote.ui.theme.ZnoteTheme
@@ -47,12 +66,43 @@ fun HomePage(
 
 }
 
+@OptIn(ExperimentalMotionApi::class)
 @Composable
 fun HomeBody(
     navHostController: NavHostController,
     state: HomeState,
     onEvent: (event: HomeEvent) -> Unit
 ) {
+
+    val lazyGridState = rememberLazyGridState()
+    val context = LocalContext.current
+    val motionScene = remember {
+        context.resources.openRawResource(R.raw.motion_scene)
+            .readBytes()
+            .decodeToString()
+    }
+
+    val scrollOffset by remember {
+        derivedStateOf {
+            lazyGridState.firstVisibleItemIndex * 100 +
+                    lazyGridState.firstVisibleItemScrollOffset
+        }
+    }
+
+    var progress by remember {
+        mutableFloatStateOf(0F)
+    }
+
+    LaunchedEffect(lazyGridState) {
+        snapshotFlow {
+            scrollOffset.toFloat()
+        }.collect { offset ->
+            val scrollSize = (offset / 100f).coerceIn(0f, 1f)
+            progress = scrollSize
+        }
+    }
+
+
 
     Scaffold(
         floatingActionButton = {
@@ -67,12 +117,50 @@ fun HomeBody(
             modifier = Modifier.padding(innerP)
         ) {
 
-            Column {
-                Text("Toutes les notes")
-                Text("8 notes")
+            MotionLayout(
+                motionScene = MotionScene(motionScene),
+                progress = progress,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .layoutId("box")
+                )
+
+                Text(
+                    "Toutes les notes",
+                    style = MaterialTheme.typography.titleLarge,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .layoutId("big_title")
+                        .fillMaxWidth()
+                )
+                Text(
+                    "${state.noteCount} notes",
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier.layoutId("note_count")
+                )
+
+                IconButton(
+                    onClick = {},
+                    modifier = Modifier.layoutId("search_button")
+                ) {
+                    Icon(Icons.Rounded.Search, contentDescription = "search note button")
+                }
+
+                IconButton(
+                    onClick = {},
+                    modifier = Modifier.layoutId("menu_button")
+                ) {
+                    Icon(Icons.Rounded.Menu, contentDescription = "menu button")
+                }
+
             }
 
             LazyVerticalGrid(
+                state = lazyGridState,
                 columns = GridCells.Fixed(2),
             ) {
                 items(state.notes) { note ->
@@ -86,7 +174,7 @@ fun HomeBody(
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(200.dp),
+                                .height(250.dp),
                             onClick = {
                                 navHostController.navigate(Routes.ShowNote(note.id))
                             }

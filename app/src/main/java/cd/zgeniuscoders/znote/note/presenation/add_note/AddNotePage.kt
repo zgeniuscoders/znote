@@ -1,8 +1,8 @@
 package cd.zgeniuscoders.znote.note.presenation.add_note
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.text.KeyboardActions
@@ -58,7 +58,6 @@ fun AddNotePage(
     val state by vm.state.collectAsStateWithLifecycle()
     val onEvent = vm::onTriggerEvent
 
-
     LaunchedEffect(state.isAdded) {
         if (state.isAdded) {
             navHostController.navigate(Routes.Home)
@@ -80,7 +79,9 @@ fun AddNotePage(
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(
+    ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class
+)
 @Composable
 fun AddNoteBody(
     snackbarHostState: SnackbarHostState,
@@ -97,10 +98,7 @@ fun AddNoteBody(
         FocusRequester()
     }
 
-//    val requestVoiceRecoderPermission = rememberP
     val focusManger = LocalFocusManager.current
-
-//    focusRequest.requestFocus()
 
     Scaffold(
         topBar = {
@@ -168,6 +166,7 @@ fun AddNoteBody(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(innerP)
+                .imePadding()
                 .onFocusEvent {
                     if (it.isFocused || it.hasFocus) {
                         coroutineScope.launch {
@@ -196,7 +195,6 @@ fun AddNoteBody(
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @PreviewLightDark
 @Composable
 fun AddNotePagePreview(modifier: Modifier = Modifier) {
