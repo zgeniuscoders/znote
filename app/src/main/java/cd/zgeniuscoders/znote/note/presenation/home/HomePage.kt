@@ -1,5 +1,6 @@
 package cd.zgeniuscoders.znote.note.presenation.home
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,6 +33,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -39,6 +42,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -52,9 +56,9 @@ import androidx.navigation.compose.rememberNavController
 import cd.zgeniuscoders.znote.R
 import cd.zgeniuscoders.znote.Routes
 import cd.zgeniuscoders.znote.note.domain.models.Note
-import cd.zgeniuscoders.znote.note.presenation.delete_notes.DeleteNoteEvent
 import cd.zgeniuscoders.znote.note.presenation.home.components.DrawerBody
 import cd.zgeniuscoders.znote.note.presenation.home.components.DrawerHeader
+import cd.zgeniuscoders.znote.note.presenation.home.components.PullRefreshLazyGrid
 import cd.zgeniuscoders.znote.ui.theme.ZnoteTheme
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -86,6 +90,18 @@ fun HomeBody(
     state: HomeState,
     onEvent: (event: HomeEvent) -> Unit
 ) {
+
+    val configuration = LocalConfiguration.current
+    var columnsPerGrid by remember {
+        mutableIntStateOf(2)
+    }
+
+
+    columnsPerGrid = when (configuration.orientation) {
+        Configuration.ORIENTATION_LANDSCAPE -> 4
+        else -> 2
+    }
+
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -195,11 +211,15 @@ fun HomeBody(
 
             }
 
-            LazyVerticalGrid(
-                state = lazyGridState,
-                columns = GridCells.Fixed(2),
-            ) {
-                items(state.notes) { note ->
+            PullRefreshLazyGrid(
+                items = state.notes,
+                isRefreshing = state.isRefreshing,
+                onRefresh = {
+                    onEvent(HomeEvent.OnPullRefresh)
+                },
+                lazyListState = lazyGridState,
+                itemsPerGrid = columnsPerGrid,
+                content = {note ->
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -231,7 +251,7 @@ fun HomeBody(
                         }
                     }
                 }
-            }
+            )
 
         }
     }

@@ -1,12 +1,11 @@
 package cd.zgeniuscoders.znote.note.presenation.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cd.zgeniuscoders.znote.Resource
 import cd.zgeniuscoders.znote.note.data.mappers.toNoteListModel
 import cd.zgeniuscoders.znote.note.domain.repository.NoteRepository
-import cd.zgeniuscoders.znote.note.presenation.delete_notes.DeleteNoteEvent
-import cd.zgeniuscoders.znote.note.presenation.delete_notes.DeleteNoteState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.launchIn
@@ -34,7 +33,16 @@ class HomeViewModel(
 
 
     fun onTriggerEvent(event: HomeEvent){
+        when (event) {
+            HomeEvent.OnPullRefresh -> onRefresh()
+        }
+    }
 
+    private fun onRefresh() {
+        viewModelScope.launch {
+            _state.update { it.copy(isRefreshing = true) }
+            getNotes()
+        }
     }
 
     private fun getNotes() {
@@ -53,7 +61,7 @@ class HomeViewModel(
                         is Resource.Error -> {
 
                             _state.update {
-                                it.copy(flashMessage = res.message.toString())
+                                it.copy(flashMessage = res.message.toString(), isRefreshing = false)
                             }
 
                         }
@@ -61,7 +69,7 @@ class HomeViewModel(
                         is Resource.Success -> {
                             val notes = res.data!!.toNoteListModel()
                             _state.update {
-                                it.copy(notes = notes)
+                                it.copy(notes = notes, isRefreshing = false)
                             }
 
                         }
