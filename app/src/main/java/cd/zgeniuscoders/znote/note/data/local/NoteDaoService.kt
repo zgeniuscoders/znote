@@ -22,7 +22,7 @@ interface NoteDaoService {
     fun show(id: Int): NoteEntity
 
     @Query("SELECT * FROM notes WHERE is_delete = 0 ORDER BY  created_at DESC")
-    fun all(): List<NoteEntity>
+    fun all(): Flow<List<NoteEntity>>
 
 
     @Query("SELECT * FROM notes WHERE is_delete = 1 ORDER BY  created_at DESC")

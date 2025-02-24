@@ -23,22 +23,23 @@ class RoomNoteRepository(
     override suspend fun getNotes(): Flow<Resource<NotesDto>> = callbackFlow {
 
         try {
-            val notes = noteDaoService
+            noteDaoService
                 .all()
-                .map { noteEntities ->
+                .onEach { noteEntities ->
 
-                    noteEntities.toNoteDtoData()
-                }
+                    val notes = noteEntities.map { noteEntity ->
+                        noteEntity.toNoteDtoData()
+                    }
 
-
-            trySend(
-                Resource.Success(
-                    NotesDto(
-                        notes
+                    trySend(
+                        Resource.Success(
+                            NotesDto(
+                                notes
+                            )
+                        )
                     )
-                )
-            )
 
+                }.launchIn(CoroutineScope(Dispatchers.IO))
 
         } catch (e: NullPointerException) {
             e.printStackTrace()
