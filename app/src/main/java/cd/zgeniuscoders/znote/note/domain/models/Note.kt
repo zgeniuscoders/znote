@@ -7,6 +7,6 @@ data class Note(
     val id: Int,
     val title: String,
     val content: String,
-    val createdAt: Long,
+    val createdAt: String,
     val isDelete: Boolean,
 )

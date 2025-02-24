@@ -245,8 +245,9 @@ fun HomeBody(
                                 style = MaterialTheme.typography.titleMedium
                             )
                             Text(
-                                "13 Jan",
+                                note.createdAt.split(" ").joinToString("/"),
                                 color = MaterialTheme.colorScheme.secondary,
+                                style = MaterialTheme.typography.bodySmall
                             )
                         }
                     }
@@ -278,6 +279,6 @@ internal val note = Note(
     1,
     "Myself bank",
     "# lorem ipsum \nhello world commen allez vous monsiier l'agent",
-    1,
+    "12 12 1093",
     false
 )
