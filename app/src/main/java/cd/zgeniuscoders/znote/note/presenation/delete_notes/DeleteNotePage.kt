@@ -5,13 +5,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.DeleteForever
+import androidx.compose.material.icons.rounded.Restore
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -133,33 +136,42 @@ fun DeleteNoteBody(
                                     navHostController.navigate(Routes.ShowNote(note.id))
                                 }
                             ) {
-                                FlowRow(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    verticalArrangement = Arrangement.SpaceBetween,
-                                    horizontalArrangement = Arrangement.SpaceBetween
+
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(10.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Column(
-                                        modifier = Modifier.padding(10.dp)
-                                    ) {
-                                        Text(
+
+                                    Text(
                                             note.title,
-                                            style = MaterialTheme.typography.titleMedium
+                                            style = MaterialTheme.typography.titleMedium,
+                                        modifier = Modifier.weight(.8f)
                                         )
-                                        if (note.content.length > 50) {
-                                            Text("${note.content.subSequence(0, 50)}...")
-                                        } else {
-                                            Text(note.content)
+
+                                    Row {
+                                        IconButton(
+                                            onClick = {
+                                                onEvent(DeleteNoteEvent.OnRestoreNote(note))
+                                            }
+                                        ) {
+                                            Icon(
+                                                Icons.Rounded.Restore,
+                                                contentDescription = "restore note forever"
+                                            )
                                         }
-                                    }
-                                    IconButton(
-                                        onClick = {
-                                            onEvent(DeleteNoteEvent.OnDeleteNote(note))
+                                        IconButton(
+                                            onClick = {
+                                                onEvent(DeleteNoteEvent.OnDeleteNote(note))
+                                            }
+                                        ) {
+                                            Icon(
+                                                Icons.Rounded.DeleteForever,
+                                                contentDescription = "delete note forever"
+                                            )
                                         }
-                                    ) {
-                                        Icon(
-                                            Icons.Rounded.DeleteForever,
-                                            contentDescription = "delete note forever"
-                                        )
                                     }
                                 }
 
@@ -183,7 +195,9 @@ fun DeleteNotePreview(modifier: Modifier = Modifier) {
         DeleteNoteBody(
             snackbarHostState = SnackbarHostState(),
             rememberNavController(),
-            DeleteNoteState()
+            DeleteNoteState(
+                notes = (0..12).map { note }
+            )
         ) { }
 
     }

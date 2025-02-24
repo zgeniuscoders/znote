@@ -34,6 +34,37 @@ class DeleteNoteViewModel(
     fun onTriggerEvent(event: DeleteNoteEvent) {
         when (event) {
             is DeleteNoteEvent.OnDeleteNote -> deleteNote(event.note)
+            is DeleteNoteEvent.OnRestoreNote -> restoreNote(event.note)
+        }
+    }
+
+    private fun restoreNote(note: Note) {
+        viewModelScope.launch {
+
+            _state.update { it.copy(flashMessage = "", isLoading = true) }
+
+            val newNote = note.copy(isDelete = false)
+            noteRepository
+                .updateNote(newNote.id, newNote)
+                .onEach { res ->
+
+                    when (res) {
+                        is Resource.Error -> {
+                            _state.update {
+                                it.copy(
+                                    flashMessage = res.message.toString(),
+                                    isLoading = false
+                                )
+                            }
+                        }
+
+                        is Resource.Success -> {
+                            getNotes()
+                            _state.update { it.copy(isLoading = false) }
+                        }
+                    }
+
+                }.launchIn(viewModelScope)
         }
     }
 
