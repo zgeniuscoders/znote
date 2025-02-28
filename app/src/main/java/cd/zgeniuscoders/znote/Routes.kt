@@ -21,6 +21,8 @@ sealed interface Routes{
     @Serializable
     data object Home: Routes
 
+    @Serializable
+    data object Search : Routes
 
     @Serializable
     data object DeleteNotes: Routes
