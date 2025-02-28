@@ -217,6 +217,7 @@ class RoomNoteRepository(
         callbackFlow {
 
             try {
+
                 noteDaoService
                     .add(NoteEntity.fromModel(note))
                 trySend(
