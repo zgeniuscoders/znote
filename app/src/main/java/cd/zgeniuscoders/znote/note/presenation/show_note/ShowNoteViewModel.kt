@@ -29,7 +29,6 @@ class ShowNoteViewModel(
 
     val state = _state.onStart {
         getNote(noteId)
-        Log.i("VN_SCOPE", "on start called")
 
     }.stateIn(
         viewModelScope,
@@ -41,10 +40,6 @@ class ShowNoteViewModel(
         when (event) {
             ShowNoteEvent.OnDeleteNote -> deleteNote()
         }
-    }
-
-    init {
-        Log.i("VN_SCOPE", "on init called")
     }
 
     private fun getNote(noteId: Int) {
@@ -93,11 +88,14 @@ class ShowNoteViewModel(
                 it.copy(flashMessage = "")
             }
 
-            Log.i("VN_SCOPE", "on delete called")
-
+            var note = state.value.note!!
+            note = note.copy(isDelete = true)
 
             noteRepository
-                .deleteNote(state.value.note!!)
+                .updateNote(
+                    noteId = note.id,
+                    note = note
+                )
                 .onEach { res ->
 
                     when (res) {

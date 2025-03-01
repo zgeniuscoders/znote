@@ -11,6 +11,10 @@ interface NoteRepository {
 
     suspend fun getNotes(): Flow<Resource<NotesDto>>
 
+    suspend fun getDeleteNotes(): Flow<Resource<NotesDto>>
+
+    suspend fun getNoteCount():Flow<Resource<Int>>
+
     suspend fun getNote(noteId: Int): Flow<Resource<NoteDto>>
 
     suspend fun addNote(note: NoteRequest): Flow<Resource<Boolean>>

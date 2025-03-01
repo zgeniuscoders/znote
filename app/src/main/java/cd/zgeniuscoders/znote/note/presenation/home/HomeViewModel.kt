@@ -1,5 +1,6 @@
 package cd.zgeniuscoders.znote.note.presenation.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import cd.zgeniuscoders.znote.Resource
@@ -22,6 +23,7 @@ class HomeViewModel(
     var state = _state
         .onStart {
             getNotes()
+            getNoteCount()
         }
         .stateIn(
             viewModelScope,
@@ -31,7 +33,16 @@ class HomeViewModel(
 
 
     fun onTriggerEvent(event: HomeEvent){
+        when (event) {
+            HomeEvent.OnPullRefresh -> onRefresh()
+        }
+    }
 
+    private fun onRefresh() {
+        viewModelScope.launch {
+            _state.update { it.copy(isRefreshing = true) }
+            getNotes()
+        }
     }
 
     private fun getNotes() {
@@ -50,7 +61,7 @@ class HomeViewModel(
                         is Resource.Error -> {
 
                             _state.update {
-                                it.copy(flashMessage = res.message.toString())
+                                it.copy(flashMessage = res.message.toString(), isRefreshing = false)
                             }
 
                         }
@@ -58,12 +69,32 @@ class HomeViewModel(
                         is Resource.Success -> {
                             val notes = res.data!!.toNoteListModel()
                             _state.update {
-                                it.copy(notes = notes)
+                                it.copy(notes = notes, isRefreshing = false)
                             }
 
                         }
                     }
 
+
+                }.launchIn(viewModelScope)
+        }
+    }
+
+
+    private fun  getNoteCount(){
+        viewModelScope.launch {
+            noteRepository
+                .getNoteCount()
+                .onEach { res ->
+
+                    when(res){
+                        is Resource.Error -> {
+                            _state.update { it.copy(flashMessage = res.message.toString()) }
+                        }
+                        is Resource.Success -> {
+                            _state.update { it.copy(noteCount = res.data!!) }
+                        }
+                    }
 
                 }.launchIn(viewModelScope)
         }

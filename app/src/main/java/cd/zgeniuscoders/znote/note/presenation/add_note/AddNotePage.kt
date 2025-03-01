@@ -1,7 +1,10 @@
 package cd.zgeniuscoders.znote.note.presenation.add_note
 
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -24,10 +27,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
@@ -39,6 +44,8 @@ import androidx.navigation.compose.rememberNavController
 import cd.zgeniuscoders.znote.R
 import cd.zgeniuscoders.znote.Routes
 import cd.zgeniuscoders.znote.ui.theme.ZnoteTheme
+import com.example.textiemdlibrary.TextEditorVisualTransformer
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -50,7 +57,6 @@ fun AddNotePage(
     val vm = koinViewModel<AddNoteViewModel>()
     val state by vm.state.collectAsStateWithLifecycle()
     val onEvent = vm::onTriggerEvent
-
 
     LaunchedEffect(state.isAdded) {
         if (state.isAdded) {
@@ -73,7 +79,9 @@ fun AddNotePage(
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(
+    ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class
+)
 @Composable
 fun AddNoteBody(
     snackbarHostState: SnackbarHostState,
@@ -82,13 +90,15 @@ fun AddNoteBody(
     onEvent: (event: AddNoteEvent) -> Unit
 ) {
 
+    val coroutineScope = rememberCoroutineScope()
+    val bringIntoViewRequester = BringIntoViewRequester()
+    val visualTransformation = remember { TextEditorVisualTransformer() }
+
     val focusRequest = remember {
         FocusRequester()
     }
 
     val focusManger = LocalFocusManager.current
-
-//    focusRequest.requestFocus()
 
     Scaffold(
         topBar = {
@@ -154,8 +164,16 @@ fun AddNoteBody(
         TextField(
             state.content,
             modifier = Modifier
-                .fillMaxSize()
-                .padding(innerP),
+                .fillMaxWidth()
+                .padding(innerP)
+                .imePadding()
+                .onFocusEvent {
+                    if (it.isFocused || it.hasFocus) {
+                        coroutineScope.launch {
+                            bringIntoViewRequester.bringIntoView()
+                        }
+                    }
+                },
             placeholder = {
                 Text(
                     stringResource(R.string.content_lbl),
@@ -170,13 +188,13 @@ fun AddNoteBody(
             ),
             onValueChange = {
                 onEvent(AddNoteEvent.OnContentChange(it))
-            }
+            },
+            visualTransformation = visualTransformation
         )
     }
 
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @PreviewLightDark
 @Composable
 fun AddNotePagePreview(modifier: Modifier = Modifier) {

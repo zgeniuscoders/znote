@@ -1,6 +1,7 @@
 package cd.zgeniuscoders.znote.note.presenation.edit_note
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -142,7 +143,8 @@ fun EditNoteBody(
             state.content,
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerP),
+                .padding(innerP)
+                .imePadding(),
             placeholder = {
                 Text(
                     stringResource(R.string.content_lbl),

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import cd.zgeniuscoders.znote.Resource
 import cd.zgeniuscoders.znote.Routes
+import cd.zgeniuscoders.znote.note.data.getCurrentDate
 import cd.zgeniuscoders.znote.note.data.mappers.toNoteModel
 import cd.zgeniuscoders.znote.note.domain.models.Note
 import cd.zgeniuscoders.znote.note.domain.repository.NoteRepository
@@ -17,7 +18,6 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.Date
 
 class EditNoteViewModel(
     private val noteRepository: NoteRepository,
@@ -109,7 +109,8 @@ class EditNoteViewModel(
                             id = state.value.noteId,
                             title = state.value.title,
                             content = state.value.content,
-                            createdAt = Date().time
+                            createdAt = getCurrentDate(),
+                            isDelete = false
                         )
                     ).onEach { res ->
 

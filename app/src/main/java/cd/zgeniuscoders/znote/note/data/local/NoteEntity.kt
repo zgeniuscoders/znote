@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import cd.zgeniuscoders.znote.note.data.dto.NoteDtoData
+import cd.zgeniuscoders.znote.note.data.toTimestamp
 import cd.zgeniuscoders.znote.note.domain.models.Note
 import cd.zgeniuscoders.znote.note.domain.models.NoteRequest
 
@@ -19,6 +20,9 @@ data class NoteEntity(
     @ColumnInfo("content")
     val content: String,
 
+    @ColumnInfo("is_delete")
+    val isDelete: Boolean,
+
     @ColumnInfo("created_at")
     val createdAt: Long,
 
@@ -30,7 +34,8 @@ data class NoteEntity(
                 id = data.id,
                 title = data.title,
                 content = data.content,
-                createdAt = data.createdAt,
+                createdAt = toTimestamp(data.createdAt),
+                isDelete = data.isDelete
             )
         }
 
@@ -39,6 +44,7 @@ data class NoteEntity(
                 title = data.title,
                 content = data.content,
                 createdAt = data.createdAt,
+                isDelete = data.isDelete
             )
         }
     }
@@ -48,7 +54,8 @@ data class NoteEntity(
             id,
             title,
             content,
-            createdAt
+            createdAt,
+            isDelete
         )
     }
 

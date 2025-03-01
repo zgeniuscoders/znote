@@ -1,4 +1,5 @@
 [versions]
+accompanistPermissions = "0.23.1"
 agp = "8.8.1"
 composeMarkdown = "0.5.6"
 kotlin = "2.0.20"
@@ -19,6 +20,7 @@ roomRuntime = "2.6.1"
 constraintlayoutCompose = "1.1.0"
 
 [libraries]
+accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanistPermissions" }
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayoutCompose" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 compose-markdown = { module = "com.github.jeziellago:compose-markdown", version.ref = "composeMarkdown" }

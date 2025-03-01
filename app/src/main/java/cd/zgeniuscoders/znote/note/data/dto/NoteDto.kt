@@ -22,5 +22,7 @@ data class NoteDtoData(
     @SerialName("content")
     val content: String,
     @SerialName("created_at")
-    val createdAt: Long
+    val createdAt: Long,
+    @SerialName("is_delete")
+    val isDelete: Boolean = false
 )

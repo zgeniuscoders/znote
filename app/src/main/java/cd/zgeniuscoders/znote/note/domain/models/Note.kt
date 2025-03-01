@@ -7,5 +7,20 @@ data class Note(
     val id: Int,
     val title: String,
     val content: String,
-    val createdAt: Long
-)
+    val createdAt: String,
+    val isDelete: Boolean,
+) {
+
+    fun doesMatchSearchQuery(query: String): Boolean {
+        val matchingCombinations = listOf(
+            "$title$content",
+            "$title $content",
+            "${title.first()}"
+        )
+
+        return matchingCombinations.any {
+            it.contains(query, ignoreCase = true)
+        }
+    }
+
+}
